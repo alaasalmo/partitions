@@ -48,3 +48,9 @@ CustomePartition
 
 
 df.write.mode(SaveMode.Append).partitionBy("col").save("s3://bucket/diroutput")
+
+
+
+
+val mydataframe = ... //put some data in your dataframe, friend
+mydataframe.write.partitionBy("year", "month", "day", "hour").option("orc.compress", "snappy").mode(SaveMode.Append).orc("/this/is/another/hdfs/directory")
