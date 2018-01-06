@@ -1,0 +1,50 @@
+Partitions (case 1):
+
+sc.defaultParallelism
+
+
+case(2):
+
+import org.apache.spark.HashPartitioner
+
+val masterdata = sc.parallelize(Seq(("math",55),("math",56),("english",57),("english", 58),("science", 59),("science", 54))).partitionBy(new HashPartitioner(5))
+  
+masterdata.getNumPartitions
+val tt=masterdata.repartition(6)
+masterdata.getNumPartitions
+
+val ttt=masterdata.coalesce(3)
+ttt.getNumPartitions  
+
+ttt.partitions.size
+
+  
+val mapped =   masterdata.mapPartitionsWithIndex{
+                         (index, iterator) => {
+                           println("Called in Partition -> " + index)
+                           val myList = iterator.toList
+                           myList.map(x => x + " -> " + index).iterator } }
+
+mapped.collect
+
+
+
+repartition Vs partitionBy
+ 
+repartition() is used for specifying the number of partitions considering the number of cores and the amount of data you have.
+
+partitionBy() is used for making shuffling functions more efficient, such as reduceByKey(), join(), cogroup() etc.. It is only beneficial in cases where a RDD is used for multiple times, so it is usually followed by persist().
+
+
+
+repartition And partitionBy in DataFrame
+
+df.repartition("entity", "year", "month", "day", "status").write.partitionBy("entity", "year", "month", "day", "status").mode(SaveMode.Append).parquet(s"$location")
+
+
+
+RangePartition
+CustomePartition
+
+
+df.write.mode(SaveMode.Append).partitionBy("col").save("s3://bucket/diroutput")
